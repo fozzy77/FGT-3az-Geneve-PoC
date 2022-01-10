@@ -1,6 +1,10 @@
 
 locals {
 
+  vpc_cidr_fgt_private_az1 = cidrsubnet(local.config.vpccidr, 5, 3)
+  vpc_cidr_fgt_private_az2 = cidrsubnet(local.config.vpccidr, 5, 4)
+  vpc_cidr_fgt_private_az3 = cidrsubnet(local.config.vpccidr, 5, 5)
+
   settings = {
     "public_az2a" = { subnet = cidrsubnet(local.config.vpccidr, 5, 0), az = local.config.az1, rt = aws_route_table.fgtvmpublicrt2a.id }
     "public_az2b" = { subnet = cidrsubnet(local.config.vpccidr, 5, 1), az = local.config.az2, rt = aws_route_table.fgtvmpublicrt2b.id }
@@ -38,7 +42,7 @@ locals {
   }
   common_tags = {
     Terraform   = true
-    Environment = "Production_${aws_vpc.customer-vpc.id}"
+ /*    Environment = "Production_${aws_vpc.customer-vpc.id}" */
   }
 }
 
@@ -60,7 +64,8 @@ resource "aws_subnet" "publicsubnet" {
   cidr_block        = each.value.subnet
   availability_zone = each.value.az
   tags = {
-    Name = "publicsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}"
+/*     Name = "publicsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}" */
+    Name = "publicsubnet_${each.value.subnet}_${each.value.az}"
   }
 }
 
@@ -70,7 +75,8 @@ resource "aws_subnet" "privatesubnet" {
   cidr_block        = each.value.subnet
   availability_zone = each.value.az
   tags = {
-    Name = "privatesubnet_${aws_vpc.customer-vpc.id}_${each.value.az}"
+/*     Name = "privatesubnet_${aws_vpc.customer-vpc.id}_${each.value.az}" */
+    Name = "privatesubnet_${each.value.subnet}_${each.value.az}"
   }
 }
 
@@ -80,7 +86,8 @@ resource "aws_subnet" "transitsubnet" {
   cidr_block        = each.value.subnet
   availability_zone = each.value.az
   tags = {
-    Name = "transitsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}"
+/*     Name = "transitsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}" */
+    Name = "transitsubnet_${each.value.subnet}_${each.value.az}"
   }
 }
 
@@ -90,7 +97,8 @@ resource "aws_subnet" "gwlbsubnet" {
   cidr_block        = each.value.subnet
   availability_zone = each.value.az
   tags = {
-    Name = "gwlbsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}"
+ /*    Name = "gwlbsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}", */
+    Name = "gwlb_${each.value.subnet}_${each.value.az}"
   }
 }
 
@@ -114,7 +122,8 @@ resource "aws_subnet" "csprivatesubnet" {
   tags = merge(
     local.common_tags,
     {
-      Name = "privatesubnet_${aws_vpc.customer-vpc.id}_${each.value.az}"
+/*       Name = "privatesubnet_${aws_vpc.customer-vpc.id}_${each.value.az}" */
+         Name = "privatesubnet_${each.value.subnet}_${each.value.az}"
     },
   )
 }
@@ -127,7 +136,8 @@ resource "aws_subnet" "csendpointsubnet" {
   tags = merge(
     local.common_tags,
     {
-      Name = "endpointsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}"
+/*       Name = "endpointsubnet_${aws_vpc.customer-vpc.id}_${each.value.az}" */
+      Name = "endpointsubnet_${each.value.subnet}_${each.value.az}"
     },
   )
 }
