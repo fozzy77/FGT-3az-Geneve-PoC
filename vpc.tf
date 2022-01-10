@@ -1,10 +1,6 @@
 
 locals {
 
-  vpc_cidr_fgt_private_az1 = cidrsubnet(local.config.vpccidr, 5, 3)
-  vpc_cidr_fgt_private_az2 = cidrsubnet(local.config.vpccidr, 5, 4)
-  vpc_cidr_fgt_private_az3 = cidrsubnet(local.config.vpccidr, 5, 5)
-
   settings = {
     "public_az2a" = { subnet = cidrsubnet(local.config.vpccidr, 5, 0), az = local.config.az1, rt = aws_route_table.fgtvmpublicrt2a.id }
     "public_az2b" = { subnet = cidrsubnet(local.config.vpccidr, 5, 1), az = local.config.az2, rt = aws_route_table.fgtvmpublicrt2b.id }
