@@ -68,6 +68,8 @@ Sent to the TGW, which inturn will forward to AZ localised GWLBe.
 
 Traffic will be recived by the fortinet via a multi-mesh geneve flow (in that any TGW AZ attached zone can connect to any FGT instance)
 
+This was orignally adapted from Fortinets Repo
+
 Output will include the information necessary to log in to the FortiGate-VM instances:
 ```sh
 Outputs: (using the dev workspace)
