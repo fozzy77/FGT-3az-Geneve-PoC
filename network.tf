@@ -203,12 +203,12 @@ resource "aws_route" "gwlbroute2b" {
 
 #### NAT AZ 2b
 resource "aws_eip" "nat_gateway_az2b" {
-/*   count = local.config.firewall_az2b ? 1 : 0 */
-  vpc        = true
+  /*   count = local.config.firewall_az2b ? 1 : 0 */
+  vpc = true
 }
 
 resource "aws_nat_gateway" "az2b" {
-/*   count = local.config.firewall_az2b ? 1 : 0 */
+  /*   count = local.config.firewall_az2b ? 1 : 0 */
   # allocation_id = aws_eip.nat_gateway_az2b[0].id
   allocation_id = aws_eip.nat_gateway_az2b.id
   subnet_id     = aws_subnet.publicsubnet["public_az2b"].id
@@ -218,11 +218,11 @@ resource "aws_nat_gateway" "az2b" {
   }
 }
 resource "aws_route" "gwlbroute2b-nat" {
-/*   count = local.config.firewall_az2b ? 1 : 0 */
+  /*   count = local.config.firewall_az2b ? 1 : 0 */
   route_table_id         = aws_route_table.fgtvmgwlbrt2b.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.az2b.id
- # nat_gateway_id         = aws_nat_gateway.az2b[0].id
+  # nat_gateway_id         = aws_nat_gateway.az2b[0].id
 }
 
 #### FGT VPC Route 2c
@@ -255,12 +255,12 @@ resource "aws_route" "gwlbroute2c" {
 
 #### NAT AZ 2c
 resource "aws_eip" "nat_gateway_az2c" {
-/*   count      = local.config.firewall_az2c ? 1 : 0 */
-  vpc        = true
+  /*   count      = local.config.firewall_az2c ? 1 : 0 */
+  vpc = true
 }
 resource "aws_nat_gateway" "az2c" {
-/*   count      = local.config.firewall_az2c ? 1 : 0 */
- # allocation_id = aws_eip.nat_gateway_az2c[0].id
+  /*   count      = local.config.firewall_az2c ? 1 : 0 */
+  # allocation_id = aws_eip.nat_gateway_az2c[0].id
   allocation_id = aws_eip.nat_gateway_az2c.id
   subnet_id     = aws_subnet.publicsubnet["public_az2c"].id
 
@@ -269,11 +269,11 @@ resource "aws_nat_gateway" "az2c" {
   }
 }
 resource "aws_route" "gwlbroute2c-nat" {
-/*   count      = local.config.firewall_az2c ? 1 : 0 */
+  /*   count      = local.config.firewall_az2c ? 1 : 0 */
   route_table_id         = aws_route_table.fgtvmgwlbrt2c.id
   destination_cidr_block = "0.0.0.0/0"
- # nat_gateway_id         = aws_nat_gateway.az2c[0].id
-  nat_gateway_id         = aws_nat_gateway.az2c.id
+  # nat_gateway_id         = aws_nat_gateway.az2c[0].id
+  nat_gateway_id = aws_nat_gateway.az2c.id
 }
 
 #### FGT Route Tables Associations TGW to reduce iteration
@@ -503,37 +503,15 @@ resource "aws_security_group" "sg1" {
 
 
 #### Creation of the SSM Endpoints to allow access to the Test EC2 instance over SSM
-resource "aws_vpc_endpoint" "ssm" {
-  service_name      = "com.amazonaws.eu-west-2.ssm"
+
+resource "aws_vpc_endpoint" "endpoints" {
+  for_each          = local.endpoints
+  service_name      = each.value.service
   subnet_ids        = [aws_subnet.csprivatesubnet["csprivate_az2a"].id]
-  vpc_endpoint_type = "Interface"
+  vpc_endpoint_type = each.value.type
   vpc_id            = aws_vpc.customer-vpc.id
   security_group_ids = [
-    aws_security_group.sg1.id,
-  ]
-
-  private_dns_enabled = true
-}
-
-resource "aws_vpc_endpoint" "ssmmessages" {
-  service_name      = "com.amazonaws.eu-west-2.ssmmessages"
-  subnet_ids        = [aws_subnet.csprivatesubnet["csprivate_az2a"].id]
-  vpc_endpoint_type = "Interface"
-  vpc_id            = aws_vpc.customer-vpc.id
-  security_group_ids = [
-    aws_security_group.sg1.id,
-  ]
-
-  private_dns_enabled = true
-}
-
-resource "aws_vpc_endpoint" "ec2mmessages" {
-  service_name      = "com.amazonaws.eu-west-2.ec2messages"
-  subnet_ids        = [aws_subnet.csprivatesubnet["csprivate_az2a"].id]
-  vpc_endpoint_type = "Interface"
-  vpc_id            = aws_vpc.customer-vpc.id
-  security_group_ids = [
-    aws_security_group.sg1.id,
+    each.value.sg,
   ]
 
   private_dns_enabled = true

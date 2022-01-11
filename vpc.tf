@@ -19,8 +19,8 @@ locals {
     "attach_az2c" = { subnet = cidrsubnet(local.config.vpccidr, 5, 8), az = local.config.az3, rt = aws_route_table.fgtvmtgwrt2c.id }
   }
 
-  settings_gwlb = { 
-    "gwlb_az2a" = { subnet = cidrsubnet(local.config.vpccidr, 5, 9), az = local.config.az1, rt = aws_route_table.fgtvmgwlbrt2a.id}
+  settings_gwlb = {
+    "gwlb_az2a" = { subnet = cidrsubnet(local.config.vpccidr, 5, 9), az = local.config.az1, rt = aws_route_table.fgtvmgwlbrt2a.id }
     "gwlb_az2b" = { subnet = cidrsubnet(local.config.vpccidr, 5, 10), az = local.config.az2, rt = aws_route_table.fgtvmgwlbrt2b.id }
     "gwlb_az2c" = { subnet = cidrsubnet(local.config.vpccidr, 5, 11), az = local.config.az3, rt = aws_route_table.fgtvmgwlbrt2c.id }
   }
@@ -37,7 +37,13 @@ locals {
     "csendpoint_az2c" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 5), az = local.config.az3 }
   }
   common_tags = {
-    Terraform   = true
+    Terraform = true
+  }
+
+  endpoints = {
+    "ssm"          = { service = "com.amazonaws.eu-west-2.ssm", sg = aws_security_group.sg1.id, type = "Interface" }
+    "ssmmessages"  = { service = "com.amazonaws.eu-west-2.ssmmessages", sg = aws_security_group.sg1.id, type = "Interface" }
+    "ec2mmessages" = { service = "com.amazonaws.eu-west-2.ec2messages", sg = aws_security_group.sg1.id, type = "Interface" }
   }
 }
 
@@ -113,7 +119,7 @@ resource "aws_subnet" "csprivatesubnet" {
   tags = merge(
     local.common_tags,
     {
-         Name = "privatesubnet_${each.value.subnet}_${each.value.az}"
+      Name = "privatesubnet_${each.value.subnet}_${each.value.az}"
     },
   )
 }
