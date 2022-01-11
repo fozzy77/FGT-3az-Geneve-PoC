@@ -8,6 +8,9 @@ resource "aws_ec2_transit_gateway" "terraform-tgwy" {
   tags = {
     Name = "terraform-tgwy"
   }
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 /* # Route Table - FGT VPC

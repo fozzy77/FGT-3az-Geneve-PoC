@@ -115,25 +115,12 @@ resource "aws_route" "cs_private" {
   transit_gateway_id     = aws_ec2_transit_gateway.terraform-tgwy.id
 }
 
-#### FGT Route Tables Associations
-resource "aws_route_table_association" "privateassociateaz2a" {
-  subnet_id      = aws_subnet.csprivatesubnet["csprivate_az2a"].id
-  route_table_id = aws_route_table.cs_private.id
+#### FGT Route Tables Associations CSprivate to reduce iteration
+resource "aws_route_table_association" "csprivate_association" {
+  for_each       = local.settings_csprivate
+  subnet_id      = aws_subnet.csprivatesubnet[each.key].id
+  route_table_id = each.value.rt
 }
-
-resource "aws_route_table_association" "privateassociateaz2b" {
-  subnet_id      = aws_subnet.csprivatesubnet["csprivate_az2b"].id
-  route_table_id = aws_route_table.cs_private.id
-}
-
-resource "aws_route_table_association" "privateassociateaz2c" {
-  subnet_id      = aws_subnet.csprivatesubnet["csprivate_az2c"].id
-  route_table_id = aws_route_table.cs_private.id
-}
-
-
-
-
 
 #### FGT VPC Specific Routes per route table
 resource "aws_route" "externalroute" {

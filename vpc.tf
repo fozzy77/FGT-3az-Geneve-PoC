@@ -19,16 +19,16 @@ locals {
     "attach_az2c" = { subnet = cidrsubnet(local.config.vpccidr, 5, 8), az = local.config.az3, rt = aws_route_table.fgtvmtgwrt2c.id }
   }
 
-  settings_gwlb = {
-    "gwlb_az2a" = { subnet = cidrsubnet(local.config.vpccidr, 5, 9), az = local.config.az1, rt = aws_route_table.fgtvmgwlbrt2a.id }
+  settings_gwlb = { 
+    "gwlb_az2a" = { subnet = cidrsubnet(local.config.vpccidr, 5, 9), az = local.config.az1, rt = aws_route_table.fgtvmgwlbrt2a.id}
     "gwlb_az2b" = { subnet = cidrsubnet(local.config.vpccidr, 5, 10), az = local.config.az2, rt = aws_route_table.fgtvmgwlbrt2b.id }
     "gwlb_az2c" = { subnet = cidrsubnet(local.config.vpccidr, 5, 11), az = local.config.az3, rt = aws_route_table.fgtvmgwlbrt2c.id }
   }
 
   settings_csprivate = {
-    "csprivate_az2a" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 0), az = local.config.az1 }
-    "csprivate_az2b" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 1), az = local.config.az2 }
-    "csprivate_az2c" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 2), az = local.config.az3 }
+    "csprivate_az2a" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 0), az = local.config.az1, rt = aws_route_table.cs_private.id }
+    "csprivate_az2b" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 1), az = local.config.az2, rt = aws_route_table.cs_private.id }
+    "csprivate_az2c" = { subnet = cidrsubnet(local.config.csvpccidr, 5, 2), az = local.config.az3, rt = aws_route_table.cs_private.id }
   }
 
   settings_csendpoint = {
