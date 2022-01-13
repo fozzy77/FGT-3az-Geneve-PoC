@@ -130,17 +130,17 @@ resource "aws_route" "externalroute" {
 }
 
 resource "aws_route" "externalroutetovpc1" {
-  depends_on             = [aws_vpc_endpoint.gwlbendpointaz2a]
+  depends_on             = [aws_vpc_endpoint.gwlbendpoints["az2a"]]
   route_table_id         = aws_route_table.fgtvmpublicrt2a.id
   destination_cidr_block = "10.0.0.0/8"
-  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpointaz2a.id
+  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpoints["az2a"].id
 }
 
 resource "aws_route" "tgwyroute" {
   depends_on             = [aws_instance.fgtvm]
   route_table_id         = aws_route_table.fgtvmtgwrt2a.id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpointaz2a.id
+  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpoints["az2a"].id
 }
 
 resource "aws_route" "gwlbroutecs" {
@@ -181,17 +181,17 @@ resource "aws_route" "externalroute2b" {
 }
 
 resource "aws_route" "externalroutetovpc2b" {
-  depends_on             = [aws_vpc_endpoint.gwlbendpointaz2b]
+  depends_on             = [aws_vpc_endpoint.gwlbendpoints["az2b"]]
   route_table_id         = aws_route_table.fgtvmpublicrt2b.id
   destination_cidr_block = "10.0.0.0/8"
-  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpointaz2b.id
+  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpoints["az2b"].id
 }
 
 resource "aws_route" "tgwyroute2b" {
   depends_on             = [aws_instance.fgtvm]
   route_table_id         = aws_route_table.fgtvmtgwrt2b.id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpointaz2b.id
+  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpoints["az2b"].id
 }
 
 resource "aws_route" "gwlbroute2b" {
@@ -203,13 +203,10 @@ resource "aws_route" "gwlbroute2b" {
 
 #### NAT AZ 2b
 resource "aws_eip" "nat_gateway_az2b" {
-  /*   count = local.config.firewall_az2b ? 1 : 0 */
   vpc = true
 }
 
 resource "aws_nat_gateway" "az2b" {
-  /*   count = local.config.firewall_az2b ? 1 : 0 */
-  # allocation_id = aws_eip.nat_gateway_az2b[0].id
   allocation_id = aws_eip.nat_gateway_az2b.id
   subnet_id     = aws_subnet.publicsubnet["public_az2b"].id
 
@@ -218,11 +215,9 @@ resource "aws_nat_gateway" "az2b" {
   }
 }
 resource "aws_route" "gwlbroute2b-nat" {
-  /*   count = local.config.firewall_az2b ? 1 : 0 */
   route_table_id         = aws_route_table.fgtvmgwlbrt2b.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.az2b.id
-  # nat_gateway_id         = aws_nat_gateway.az2b[0].id
 }
 
 #### FGT VPC Route 2c
@@ -233,17 +228,17 @@ resource "aws_route" "externalroute2c" {
 }
 
 resource "aws_route" "externalroutetovpc12c" {
-  depends_on             = [aws_vpc_endpoint.gwlbendpointaz2c]
+  depends_on             = [aws_vpc_endpoint.gwlbendpoints["az2c"]]
   route_table_id         = aws_route_table.fgtvmpublicrt2c.id
   destination_cidr_block = "10.0.0.0/8"
-  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpointaz2c.id
+  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpoints["az2c"].id
 }
 
 resource "aws_route" "tgwyroute2c" {
   depends_on             = [aws_instance.fgtvm]
   route_table_id         = aws_route_table.fgtvmtgwrt2c.id
   destination_cidr_block = "0.0.0.0/0"
-  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpointaz2c.id
+  vpc_endpoint_id        = aws_vpc_endpoint.gwlbendpoints["az2c"].id
 }
 
 resource "aws_route" "gwlbroute2c" {
@@ -448,31 +443,17 @@ resource "aws_lb_target_group_attachment" "fgt3attach" {
   port             = 6081
 }
 
-
 resource "aws_vpc_endpoint_service" "fgtgwlbservice" {
   acceptance_required        = false
   gateway_load_balancer_arns = [aws_lb.gateway_lb.arn]
 }
 
-#### FGT Endpoints per AZ
-resource "aws_vpc_endpoint" "gwlbendpointaz2a" {
-  service_name      = aws_vpc_endpoint_service.fgtgwlbservice.service_name
-  subnet_ids        = [aws_subnet.gwlbsubnet["gwlb_az2a"].id]
-  vpc_endpoint_type = aws_vpc_endpoint_service.fgtgwlbservice.service_type
-  vpc_id            = aws_vpc.fgtvm-vpc.id
-}
-
-resource "aws_vpc_endpoint" "gwlbendpointaz2b" {
-  service_name      = aws_vpc_endpoint_service.fgtgwlbservice.service_name
-  subnet_ids        = [aws_subnet.gwlbsubnet["gwlb_az2b"].id]
-  vpc_endpoint_type = aws_vpc_endpoint_service.fgtgwlbservice.service_type
-  vpc_id            = aws_vpc.fgtvm-vpc.id
-}
-
-resource "aws_vpc_endpoint" "gwlbendpointaz2c" {
-  service_name      = aws_vpc_endpoint_service.fgtgwlbservice.service_name
-  subnet_ids        = [aws_subnet.gwlbsubnet["gwlb_az2c"].id]
-  vpc_endpoint_type = aws_vpc_endpoint_service.fgtgwlbservice.service_type
+#### FGT Endpoints per AZ to reduce iteration
+resource "aws_vpc_endpoint" "gwlbendpoints" {
+  for_each          = local.gwlbendpoints
+  service_name      = each.value.service
+  subnet_ids        = [each.value.subnet]
+  vpc_endpoint_type = each.value.type
   vpc_id            = aws_vpc.fgtvm-vpc.id
 }
 
@@ -501,9 +482,7 @@ resource "aws_security_group" "sg1" {
   }
 }
 
-
 #### Creation of the SSM Endpoints to allow access to the Test EC2 instance over SSM
-
 resource "aws_vpc_endpoint" "endpoints" {
   for_each          = local.endpoints
   service_name      = each.value.service

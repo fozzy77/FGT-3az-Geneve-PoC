@@ -1,6 +1,3 @@
-########################################################
-# Transit Gateway
-########################################################
 resource "aws_ec2_transit_gateway" "terraform-tgwy" {
   description                     = "Transit Gateway with 2 VPCs"
   default_route_table_association = "disable"
@@ -13,15 +10,6 @@ resource "aws_ec2_transit_gateway" "terraform-tgwy" {
   }
 }
 
-/* # Route Table - FGT VPC
-resource "aws_ec2_transit_gateway_route_table" "tgwy-fgt-route" {
-  depends_on         = [aws_ec2_transit_gateway.terraform-tgwy]
-  transit_gateway_id = aws_ec2_transit_gateway.terraform-tgwy.id
-  tags = {
-    Name = "tgwy-fgt-route"
-  }
-} */
-
 # Route Table - Live Services
 resource "aws_ec2_transit_gateway_route_table" "tgwy-vpc-route" {
   depends_on         = [aws_ec2_transit_gateway.terraform-tgwy]
@@ -30,7 +18,6 @@ resource "aws_ec2_transit_gateway_route_table" "tgwy-vpc-route" {
     Name = "tgwy-customer-vpc-route"
   }
 }
-
 
 # VPC attachment - FGT VPC
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-att-vpc-fgt" {
@@ -46,7 +33,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-att-vpc-fgt" {
   depends_on = [aws_ec2_transit_gateway.terraform-tgwy]
 }
 
-
 # VPC attachment - CS1 VPC
 resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-att-vpc-vpc1" {
   appliance_mode_support                          = "enable"
@@ -60,7 +46,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw-att-vpc-vpc1" {
   }
   depends_on = [aws_ec2_transit_gateway.terraform-tgwy]
 }
-
 
 # TGW Routes - Customer VPC
 resource "aws_ec2_transit_gateway_route" "customer-default-route" {
@@ -80,7 +65,6 @@ resource "aws_ec2_transit_gateway_route_table_association" "tgw-rt-vpc-fgt-assoc
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tgw-att-vpc-fgt.id
   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgwy-vpc-route.id
 }
-
 
 # Route Tables Propagations - FGT VPC Route
 resource "aws_ec2_transit_gateway_route_table_propagation" "tgw-rt-prop-fgt-w-cs" {

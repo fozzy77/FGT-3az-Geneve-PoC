@@ -21,7 +21,7 @@ data "aws_network_interface" "fgt2eth1" {
 //
 data "aws_network_interface" "vpcendpointipaz2b_fgt2" {
   count      = local.config.firewall_az2b ? 1 : 0
-  depends_on = [aws_vpc_endpoint.gwlbendpointaz2b]
+  depends_on = [aws_vpc_endpoint.gwlbendpoints["az2b"]]
   filter {
     name   = "vpc-id"
     values = ["${aws_vpc.fgtvm-vpc.id}"]
@@ -43,7 +43,7 @@ data "aws_network_interface" "vpcendpointipaz2b_fgt2" {
 
 data "aws_network_interface" "vpcendpointipaz2a_fgt2" {
   count      = local.config.firewall_az2b ? 1 : 0
-  depends_on = [aws_vpc_endpoint.gwlbendpointaz2b]
+  depends_on = [aws_vpc_endpoint.gwlbendpoints["az2b"]]
   filter {
     name   = "vpc-id"
     values = ["${aws_vpc.fgtvm-vpc.id}"]
@@ -65,7 +65,7 @@ data "aws_network_interface" "vpcendpointipaz2a_fgt2" {
 
 data "aws_network_interface" "vpcendpointipaz2c_fgt2" {
   count      = local.config.firewall_az2b ? 1 : 0
-  depends_on = [aws_vpc_endpoint.gwlbendpointaz2a]
+  depends_on = [aws_vpc_endpoint.gwlbendpoints["az2b"]]
   filter {
     name   = "vpc-id"
     values = ["${aws_vpc.fgtvm-vpc.id}"]

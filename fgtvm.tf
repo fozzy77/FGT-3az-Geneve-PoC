@@ -17,7 +17,7 @@ data "aws_network_interface" "eth1" {
 
 //
 data "aws_network_interface" "vpcendpointipaz2a_fgt1" {
-  depends_on = [aws_vpc_endpoint.gwlbendpointaz2a]
+  depends_on = [aws_vpc_endpoint.gwlbendpoints["az2a"]]
   filter {
     name   = "vpc-id"
     values = ["${aws_vpc.fgtvm-vpc.id}"]
@@ -38,7 +38,7 @@ data "aws_network_interface" "vpcendpointipaz2a_fgt1" {
 }
 
 data "aws_network_interface" "vpcendpointipaz2b_fgt1" {
-  depends_on = [aws_vpc_endpoint.gwlbendpointaz2a]
+  depends_on = [aws_vpc_endpoint.gwlbendpoints["az2a"]]
   filter {
     name   = "vpc-id"
     values = ["${aws_vpc.fgtvm-vpc.id}"]
@@ -59,7 +59,7 @@ data "aws_network_interface" "vpcendpointipaz2b_fgt1" {
 }
 
 data "aws_network_interface" "vpcendpointipaz2c_fgt1" {
-  depends_on = [aws_vpc_endpoint.gwlbendpointaz2a]
+  depends_on = [aws_vpc_endpoint.gwlbendpoints["az2a"]]
   filter {
     name   = "vpc-id"
     values = ["${aws_vpc.fgtvm-vpc.id}"]
